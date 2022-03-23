@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  dynamodb:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:1.17.2"
+    hostname: dynamodb
+    ports:
+      - "8000:8000"
+    volumes:
+      - "dynamodb-data:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+    user: root
+    networks:
+      - dynamodb-admin-network
+
+  admin:
+    image: boogak/dynamodb-admin
+    ports:
+      - 8001:8001
+    environment: 
+      - DYNAMO_ENDPOINT=http://dynamodb:8000
+    networks:
+      - dynamodb-admin-network
+
+networks:
+  dynamodb-admin-network:
+    driver: bridge
+
+volumes:
+  dynamodb-data:
